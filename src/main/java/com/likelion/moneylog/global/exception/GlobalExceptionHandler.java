@@ -43,6 +43,14 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error(code.name(), code.getMessage()));
     }
 
+    // ③-1 리소스 없음(findByIdAndUserId 등에서 발생) → 404, 도메인별 code/message 그대로 전달
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleNotFound(NotFoundException e) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(ApiResponse.error(e.getCode(), e.getMessage()));
+    }
+
     // ④ 최후의 방어선: 예상 못 한 예외는 500으로, 상세는 로그로만 (민감정보 노출 금지)
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleUnknown(Exception e) {
