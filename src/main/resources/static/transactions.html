@@ -10,9 +10,9 @@
 <div class="page">
     <h1>거래내역</h1>
 
-    <!-- 거래 등록 폼 -->
+    <!-- 거래 등록/수정 폼 -->
     <div class="card">
-        <h2>새 거래 등록</h2>
+        <h2 id="formTitle">새 거래 등록</h2>
         <form id="txForm">
             <div class="tx-form-grid">
                 <div class="field">
@@ -39,7 +39,10 @@
                     <input type="text" id="description" placeholder="내용 (선택)" />
                 </div>
             </div>
-            <button type="submit">등록</button>
+            <div class="form-actions">
+                <button type="submit" id="submitBtn">등록</button>
+                <button type="button" id="cancelEditBtn" class="btn-secondary hidden">취소</button>
+            </div>
         </form>
         <p id="msg" class="msg"></p>
     </div>
@@ -50,16 +53,26 @@
         <p id="pageInfo" class="page-info"></p>
         <table>
             <thead>
-            <tr><th>날짜</th><th>타입</th><th>금액</th><th>내용</th></tr>
+            <tr><th>날짜</th><th>타입</th><th>카테고리</th><th>금액</th><th>내용</th><th></th></tr>
             </thead>
             <tbody id="txBody"></tbody>
         </table>
+        <div class="pagination">
+            <button type="button" id="prevPageBtn" class="btn-secondary">이전</button>
+            <span id="pageIndicator" class="page-indicator"></span>
+            <button type="button" id="nextPageBtn" class="btn-secondary">다음</button>
+        </div>
     </div>
 </div>
 
 <script src="api.js"></script>
 <script>
     requireLogin(); // 미로그인 시 로그인 페이지로
+
+    const PAGE_SIZE = 5;
+    let currentPage = 0;   // 0-based
+    let totalPages = 1;
+    let editingId = null;  // null이면 등록 모드, 값이 있으면 해당 id 수정 모드
 
     // 이번 달 yearMonth 문자열 ("2026-07")
     const now = new Date();
@@ -91,9 +104,11 @@
 
     document.getElementById("type").addEventListener("change", () => renderCategoryOptions());
 
-    // 목록 불러와 표 그리기
+    // 목록 불러와 표 그리기 (5건씩 페이징)
     async function loadTransactions() {
-        const body = await apiFetch(`/api/transactions?yearMonth=${yearMonth}`);
+        const body = await apiFetch(
+            `/api/transactions?yearMonth=${yearMonth}&page=${currentPage}&size=${PAGE_SIZE}`
+        );
         // 공통 응답 형식: 실제 목록은 body.data.transactions, 페이지 정보는 body.meta.pagination
         const list = body.data.transactions;
         const page = body.meta?.pagination;
@@ -102,7 +117,7 @@
         tbody.innerHTML = "";
 
         if (list.length === 0) {
-            tbody.innerHTML = `<tr class="empty-row"><td colspan="4">이번 달 거래 내역이 없습니다.</td></tr>`;
+            tbody.innerHTML = `<tr class="empty-row"><td colspan="6">이번 달 거래 내역이 없습니다.</td></tr>`;
         } else {
             list.forEach((t) => {
                 const isIncome = t.type === "INCOME";
@@ -110,21 +125,90 @@
                 tr.innerHTML = `
               <td>${t.transactionDate}</td>
               <td><span class="badge ${isIncome ? "income" : "expense"}">${isIncome ? "수입" : "지출"}</span></td>
+              <td>${t.categoryName}</td>
               <td class="amount">${t.amount.toLocaleString()}원</td>
-              <td>${t.description ?? ""}</td>`;
+              <td>${t.description ?? ""}</td>
+              <td class="row-actions">
+                <button type="button" class="link-btn edit-btn">수정</button>
+                <button type="button" class="link-btn danger delete-btn">삭제</button>
+              </td>`;
+                tr.querySelector(".edit-btn").addEventListener("click", () => enterEditMode(t));
+                tr.querySelector(".delete-btn").addEventListener("click", () => deleteTransaction(t.id));
                 tbody.appendChild(tr);
             });
         }
 
-        // 페이지네이션 meta가 있으면 총 개수/다음 페이지 유무를 간단히 표시
+        // 페이지네이션 meta로 다음/이전 버튼과 안내 문구 갱신
         if (page) {
-            document.getElementById("pageInfo").textContent =
-                `총 ${page.totalItems}건 · ${page.page + 1}/${page.totalPages}쪽` +
-                (page.hasNext ? " · 다음 페이지 있음" : "");
+            totalPages = Math.max(page.totalPages, 1);
+            document.getElementById("pageInfo").textContent = `총 ${page.totalItems}건`;
+            document.getElementById("pageIndicator").textContent = `${page.page + 1} / ${totalPages}쪽`;
+            document.getElementById("prevPageBtn").disabled = !page.hasPrev;
+            document.getElementById("nextPageBtn").disabled = !page.hasNext;
         }
     }
 
-    // 새 거래 등록
+    document.getElementById("prevPageBtn").addEventListener("click", () => {
+        if (currentPage > 0) {
+            currentPage -= 1;
+            loadTransactions();
+        }
+    });
+
+    document.getElementById("nextPageBtn").addEventListener("click", () => {
+        if (currentPage < totalPages - 1) {
+            currentPage += 1;
+            loadTransactions();
+        }
+    });
+
+    // 목록의 "수정" 클릭 → 상단 폼에 값 채우고 수정 모드로 전환
+    function enterEditMode(t) {
+        editingId = t.id;
+        document.getElementById("type").value = t.type;
+        renderCategoryOptions(t.categoryId);
+        document.getElementById("amount").value = t.amount;
+        document.getElementById("description").value = t.description ?? "";
+        document.getElementById("transactionDate").value = t.transactionDate;
+
+        document.getElementById("formTitle").textContent = "거래 수정";
+        document.getElementById("submitBtn").textContent = "수정 완료";
+        document.getElementById("cancelEditBtn").classList.remove("hidden");
+        document.getElementById("msg").textContent = "";
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function exitEditMode() {
+        editingId = null;
+        document.getElementById("txForm").reset();
+        renderCategoryOptions();
+
+        document.getElementById("formTitle").textContent = "새 거래 등록";
+        document.getElementById("submitBtn").textContent = "등록";
+        document.getElementById("cancelEditBtn").classList.add("hidden");
+    }
+
+    document.getElementById("cancelEditBtn").addEventListener("click", exitEditMode);
+
+    // 삭제
+    async function deleteTransaction(id) {
+        if (!confirm("이 거래내역을 삭제할까요?")) return;
+
+        try {
+            await apiFetch(`/api/transactions/${id}`, { method: "DELETE" });
+            if (editingId === id) exitEditMode(); // 수정 중이던 항목이 삭제된 경우 폼 초기화
+
+            // 현재 페이지의 마지막 항목을 지워 빈 페이지가 되면 이전 페이지로
+            if (currentPage > 0 && document.querySelectorAll("#txBody tr:not(.empty-row)").length === 1) {
+                currentPage -= 1;
+            }
+            await loadTransactions();
+        } catch (err) {
+            document.getElementById("msg").textContent = err.message;
+        }
+    }
+
+    // 새 거래 등록 / 수정 제출
     document.getElementById("txForm").addEventListener("submit", async (e) => {
         e.preventDefault();
         const body = {
@@ -135,13 +219,21 @@
             transactionDate: document.getElementById("transactionDate").value,
         };
         try {
-            await apiFetch("/api/transactions", {
-                method: "POST",
-                body: JSON.stringify(body),
-            });
-            e.target.reset();
-            renderCategoryOptions(); // reset()으로 타입이 바뀌었을 수 있으니 카테고리 목록도 다시 맞춤
-            await loadTransactions(); // 등록 후 목록 갱신
+            if (editingId) {
+                await apiFetch(`/api/transactions/${editingId}`, {
+                    method: "PUT",
+                    body: JSON.stringify(body),
+                });
+                exitEditMode();
+            } else {
+                await apiFetch("/api/transactions", {
+                    method: "POST",
+                    body: JSON.stringify(body),
+                });
+                e.target.reset();
+                renderCategoryOptions(); // reset()으로 타입이 바뀌었을 수 있으니 카테고리 목록도 다시 맞춤
+            }
+            await loadTransactions(); // 등록/수정 후 목록 갱신
         } catch (err) {
             document.getElementById("msg").textContent = err.message;
         }

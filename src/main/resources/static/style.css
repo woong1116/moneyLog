@@ -157,6 +157,34 @@ button:hover {
   background: var(--accent-hover);
 }
 
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.form-actions button {
+  flex: 1;
+}
+
+.btn-secondary {
+  color: var(--accent);
+  background: transparent;
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+  background: var(--bg);
+}
+
+.hidden {
+  display: none;
+}
+
 .msg {
   min-height: 1.2em;
   margin: 12px 0 0;
@@ -242,4 +270,48 @@ tbody tr:last-child td {
   text-align: center;
   color: var(--text-muted);
   padding: 32px 12px;
+}
+
+.row-actions {
+  white-space: nowrap;
+  text-align: right;
+}
+
+.link-btn {
+  padding: 4px 8px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.link-btn:hover {
+  color: var(--accent);
+  background: var(--bg);
+}
+
+.link-btn.danger:hover {
+  color: var(--danger);
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.pagination .btn-secondary {
+  width: auto;
+  padding: 8px 16px;
+}
+
+.page-indicator {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
 }

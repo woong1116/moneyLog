@@ -1,6 +1,5 @@
 package com.likelion.moneylog.domain.transaction.controller;
 
-import com.likelion.moneylog.domain.transaction.dto.TransactionSearchCond;
 import com.likelion.moneylog.global.response.ApiResponse;
 import com.likelion.moneylog.global.response.PageMeta;
 import com.likelion.moneylog.domain.transaction.dto.TransactionRequest;
@@ -42,7 +41,7 @@ public class TransactionController {
             @RequestParam(required = false) String yearMonth,
             @RequestParam(required = false) TransactionType type,
             @RequestParam(required = false) Long categoryId,
-            @PageableDefault(size = 20) Pageable pageable) {
+            @PageableDefault(size = 5) Pageable pageable) {
         Page<TransactionResponse> data =
                 transactionService.getMyTransactions(userId, yearMonth, type, categoryId, pageable);
         return ApiResponse.success(
