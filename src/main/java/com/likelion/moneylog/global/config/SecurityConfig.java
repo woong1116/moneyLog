@@ -32,7 +32,8 @@ public class SecurityConfig {
             "/login.html",
             "/signup.html",
             "/transactions.html",
-            "/api.js"
+            "/api.js",
+            "/style.css"
     };
 
     @Bean

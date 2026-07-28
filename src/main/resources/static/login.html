@@ -2,17 +2,27 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>머니로그 - 로그인</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body>
-<h1>머니로그 로그인</h1>
-<form id="loginForm">
-  <input type="email" id="email" placeholder="이메일" required />
-  <input type="password" id="password" placeholder="비밀번호" required />
-  <button type="submit">로그인</button>
-</form>
-<p id="msg" style="color:red"></p>
-<p><a href="signup.html">계정이 없으신가요? 회원가입</a></p>
+<body class="auth">
+<div class="auth-card">
+  <h1>머니로그 로그인</h1>
+  <form id="loginForm">
+    <div class="field">
+      <label for="email">이메일</label>
+      <input type="email" id="email" placeholder="you@example.com" required />
+    </div>
+    <div class="field">
+      <label for="password">비밀번호</label>
+      <input type="password" id="password" placeholder="비밀번호" required />
+    </div>
+    <button type="submit">로그인</button>
+  </form>
+  <p id="msg" class="msg"></p>
+  <p class="switch-link"><a href="signup.html">계정이 없으신가요? 회원가입</a></p>
+</div>
 
 <script>
   // 빈 문자열 = 이 페이지를 서빙한 origin으로 요청 (localhost든 배포 서버든 자동으로 맞음)
