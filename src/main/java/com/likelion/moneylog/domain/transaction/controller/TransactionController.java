@@ -27,13 +27,11 @@ public class TransactionController {
 
     private final TransactionService transactionService;
 
-    // TODO(1-8): userId 파라미터를 @AuthenticationPrincipal 로그인 사용자로 교체
-    private static final Long TEMP_USER_ID = 1L;
-
     @PostMapping
     public ResponseEntity<ApiResponse<TransactionResponse>> create(
+            @AuthenticationPrincipal Long userId,
             @Valid @RequestBody TransactionRequest req) {
-        TransactionResponse created = transactionService.create(TEMP_USER_ID, req);
+        TransactionResponse created = transactionService.create(userId, req);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("거래내역 등록에 성공했습니다.", created));
     }
@@ -63,14 +61,15 @@ public class TransactionController {
 
     @PutMapping("/{id}")
     public ApiResponse<TransactionResponse> update(
+            @AuthenticationPrincipal Long userId,
             @PathVariable Long id, @Valid @RequestBody TransactionRequest req) {
         return ApiResponse.success("거래내역 수정에 성공했습니다.",
-                transactionService.update(TEMP_USER_ID, id, req));
+                transactionService.update(userId, id, req));
     }
 
     @DeleteMapping("/{id}")
-    public ApiResponse<Void> delete(@PathVariable Long id) {
-        transactionService.delete(TEMP_USER_ID, id);
+    public ApiResponse<Void> delete(@AuthenticationPrincipal Long userId, @PathVariable Long id) {
+        transactionService.delete(userId, id);
         return ApiResponse.success("거래내역 삭제에 성공했습니다.", null);
     }
 }

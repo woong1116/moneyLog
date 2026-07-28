@@ -157,27 +157,6 @@ button:hover {
   background: var(--accent-hover);
 }
 
-.inline-add {
-  display: flex;
-  gap: 8px;
-}
-
-.inline-add input {
-  flex: 1;
-}
-
-.btn-secondary {
-  flex-shrink: 0;
-  width: auto;
-  color: var(--accent);
-  background: transparent;
-  border: 1px solid var(--border);
-}
-
-.btn-secondary:hover {
-  background: var(--bg);
-}
-
 .msg {
   min-height: 1.2em;
   margin: 12px 0 0;

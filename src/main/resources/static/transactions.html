@@ -38,13 +38,6 @@
                     <label for="description">내용</label>
                     <input type="text" id="description" placeholder="내용 (선택)" />
                 </div>
-                <div class="field full">
-                    <label for="newCategoryName">새 카테고리 추가</label>
-                    <div class="inline-add">
-                        <input type="text" id="newCategoryName" placeholder="카테고리 이름" maxlength="50" />
-                        <button type="button" id="addCategoryBtn" class="btn-secondary">추가</button>
-                    </div>
-                </div>
             </div>
             <button type="submit">등록</button>
         </form>
@@ -88,7 +81,7 @@
         const select = document.getElementById("categoryId");
 
         const placeholder = filtered.length === 0
-            ? `<option value="" disabled selected>카테고리를 먼저 추가하세요</option>`
+            ? `<option value="" disabled selected>선택 가능한 카테고리가 없습니다</option>`
             : `<option value="" disabled selected>카테고리 선택</option>`;
 
         select.innerHTML = placeholder + filtered
@@ -97,25 +90,6 @@
     }
 
     document.getElementById("type").addEventListener("change", () => renderCategoryOptions());
-
-    // 새 카테고리 추가 (현재 선택된 타입으로 등록)
-    document.getElementById("addCategoryBtn").addEventListener("click", async () => {
-        const nameInput = document.getElementById("newCategoryName");
-        const name = nameInput.value.trim();
-        if (!name) return;
-
-        try {
-            const body = await apiFetch("/api/categories", {
-                method: "POST",
-                body: JSON.stringify({ name, type: document.getElementById("type").value }),
-            });
-            categories.push(body.data);
-            nameInput.value = "";
-            renderCategoryOptions(body.data.id); // 방금 만든 카테고리를 바로 선택
-        } catch (err) {
-            document.getElementById("msg").textContent = err.message;
-        }
-    });
 
     // 목록 불러와 표 그리기
     async function loadTransactions() {

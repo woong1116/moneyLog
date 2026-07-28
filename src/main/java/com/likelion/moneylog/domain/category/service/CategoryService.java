@@ -77,8 +77,10 @@ public class CategoryService {
                 Category.of(user, "교통", CategoryType.EXPENSE),
                 Category.of(user, "주거", CategoryType.EXPENSE),
                 Category.of(user, "문화", CategoryType.EXPENSE),
+                Category.of(user, "기타", CategoryType.EXPENSE),
                 Category.of(user, "급여", CategoryType.INCOME),
-                Category.of(user, "용돈", CategoryType.INCOME)
+                Category.of(user, "용돈", CategoryType.INCOME),
+                Category.of(user, "기타", CategoryType.INCOME)
         );
         categoryRepository.saveAll(defaults);
     }
