@@ -14,6 +14,10 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
 
+jwt:
+  secret: ${JWT_SECRET:dGVzdC1zZWNyZXQta2V5LWZvci1sb2NhbC1kZXYtb25seS0zMmJ5dGVzIQ==}
+  expiration-ms: ${JWT_EXPIRATION_MS:3600000}
+
 ---
 # ===== 로컬 프로파일 (H2 인메모리) =====
 spring:
@@ -54,7 +58,3 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
-
-jwt:
-  secret: ${JWT_SECRET:dGVzdC1zZWNyZXQta2V5LWZvci1sb2NhbC1kZXYtb25seS0zMmJ5dGVzIQ==}
-  expiration-ms: ${JWT_EXPIRATION_MS:3600000}
