@@ -39,7 +39,7 @@ public class TransactionController {
     }
 
     @GetMapping
-    public ApiResponse<Page<TransactionResponse>> list(
+    public ApiResponse<Map<String, List<TransactionResponse>>> list(
             @AuthenticationPrincipal Long userId,        // ← 현재 로그인 사용자 id
             @RequestParam(required = false) String yearMonth,
             @RequestParam(required = false) TransactionType type,
@@ -47,7 +47,10 @@ public class TransactionController {
             @PageableDefault(size = 20) Pageable pageable) {
         Page<TransactionResponse> data =
                 transactionService.getMyTransactions(userId, yearMonth, type, categoryId, pageable);
-        return ApiResponse.success("거래내역 목록 조회에 성공했습니다.", data);
+        return ApiResponse.success(
+                "거래내역 목록 조회에 성공했습니다.",
+                Map.of("transactions", data.getContent()),
+                PageMeta.from(data));
     }
 
     // 단건 조회: 남의 것이면 403(FORBIDDEN)
