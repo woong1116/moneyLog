@@ -1,0 +1,10 @@
+package com.likelion.moneylog.domain.user.dto;
+
+import com.likelion.moneylog.domain.user.entity.User;
+
+// 회원가입 성공 시 data
+public record SignupResponse(Long userId, String email, String nickname) {
+    public static SignupResponse from(User user) {
+        return new SignupResponse(user.getId(), user.getEmail(), user.getNickname());
+    }
+}
