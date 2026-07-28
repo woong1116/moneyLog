@@ -19,7 +19,7 @@ services:
 
   app:
     image: ghcr.io/${GH_OWNER}/moneylog:latest  # CD가 push한 이미지 (로컬 테스트 땐 build 사용)
-    build: .                                     # 로컬에선 현재 Dockerfile로 빌드
+#    build: .                                     # 로컬에선 현재 Dockerfile로 빌드
     container_name: moneylog-app
     depends_on:
       db:
