@@ -1,5 +1,6 @@
 // api.js — 모든 화면에서 <script src="api.js"></script> 로 먼저 로드
-const API_BASE = "http://localhost:8080";
+// 빈 문자열 = 이 페이지를 서빙한 origin으로 요청 (localhost든 배포 서버든 자동으로 맞음)
+const API_BASE = "";
 
 // 저장된 토큰을 자동으로 Authorization 헤더에 첨부하는 fetch 래퍼.
 // 백엔드는 성공/에러 모두 공통 응답 형식으로 응답한다:
